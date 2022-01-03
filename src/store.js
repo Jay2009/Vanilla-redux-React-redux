@@ -12,6 +12,7 @@ const addToDo = text => {
     };
 };
 
+
 const deleteToDo = id => {
     return {
         type: DELETE,
