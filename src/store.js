@@ -1,46 +1,58 @@
 import { createStore } from "redux";
+import {configureStore, createAction, createReducer, createSlice } from "@reduxjs/toolkit"
 
-const ADD ="ADD";
-const DELETE = "DELETE";
+
 const localStorageTodo = JSON.parse(localStorage.getItem("todo"));
 const currentState = localStorageTodo ? localStorageTodo : [];
 
-const addToDo = text => {
-    return {
-        type: ADD,
-        text
-    };
-};
+// const addToDo = createAction ("ADD");
+// const deleteToDo = createAction("DELETE");
 
-
-const deleteToDo = id => {
-    return {
-        type: DELETE,
-        id: parseInt(id)
-    };
-};
-
-const reducer = (state = currentState, action) => {
+// pure redux
+/*const reducer = (state = currentState, action) => {
     switch(action.type){
-        case ADD:
-            const newTodoObject = {text: action.text, id: Date.now(), ...state};
+        case addToDo.type:
+            const newTodoObject = {text: action.payload, id: Date.now(), ...state};
             const addTodoResult = [newTodoObject, ...state];
             localStorage.setItem("todo", JSON.stringify(addTodoResult));
             return addTodoResult;
-        case DELETE:
-            const deleteTodoResult = state.filter(toDo => toDo.id !== action.id);    
+        case deleteToDo.type:
+            const deleteTodoResult = state.filter(toDo => toDo.id !== action.payload);    
             localStorage.setItem("todo", JSON.stringify(deleteTodoResult));
             return deleteTodoResult
         default:
             return state;
     };
 };
+*/
 
-const store = createStore(reducer);
+// redux toolkit
+/*
+const reducer = createReducer ([], {
+    [addToDo] : (state, action) => {
+        state.push({text: action.payload, id: Date.now()});
+    },
+    [deleteToDo] : (state, action) =>
+        state.filter(toDo => toDo.id !== action.payload)
+})
+*/
 
-export const actionCreators = {
-    addToDo,
-    deleteToDo
+
+// createSlice
+
+const toDos = createSlice({
+    name: "toDosReducer",
+    initialState: [],
+    reducers: {
+    add: (state, action) => {
+        state.push({ text: action.payload, id: Date.now() });
+    },
+    remove: (state, action) => state.filter(toDo => toDo.id !== action.payload)
 }
+});
+
+const store = configureStore({reducer: toDos.reducer});
+
+export const  {add,remove} = toDos.actions;
 
 export default store;
